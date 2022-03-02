@@ -7,6 +7,7 @@ const setAuth = (auth) => {
 };
 const get = (endpoint) => {
     return new Promise(function(resolve, reject) {
+        console.log("get - " + endpoint) 
         resolve(fetch(`${_auth.protocol}://${_auth.address}:${_auth.port}${endpoint}`, {
                 headers: {
                     'Accept': "application/json",

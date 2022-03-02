@@ -2,14 +2,14 @@ import React, { lazy } from 'react'
 import Loadable from 'app/components/Loadable/Loadable'
 import { authRoles } from '../../auth/authRoles'
 
-const Friends = Loadable(lazy(() => import('./Friends')))
+const Hextech = Loadable(lazy(() => import('./Hextech')))
 
-const friendsRoutes = [
+const hextechRoutes = [
     {
-        path: '/friends/default',
-        element: <Friends />,
+        path: '/hextech/default',
+        element: <Hextech />,
         auth: authRoles.admin,
     },
 ]
 
-export default friendsRoutes
+export default hextechRoutes

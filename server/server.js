@@ -11,7 +11,8 @@ const HTTP = http.Server(Api);
 Api.use(cors());
 
 Api.get('/test', (req, res) => res.status(200).send('aeeee porraa!'));
-Api.get('/friends', (req, res) => res.status(200).send(friendsCache));
+Api.get('/friends/get', (req, res) => res.status(200).send(friendsCache));
+Api.get('/hextech/inventory', (req, res) => getInventory().then(inventory => res.status(200).send(inventory)));
 
 HTTP.listen(9001, () => {
     console.log('listening on *:9001');
@@ -41,9 +42,27 @@ const json = require("big-json")
 //global cache
 let friendsCache = {};
 let matchesCache = {};
+let inventoryCache = {}
 
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+
+const getInventory = async () => {
+    let inventory = undefined;
+    if ("inventory" in inventoryCache) {
+        inventory = inventoryCache.inventory;
+        if (new Date() - inventoryCache["lastUpdate"] < 60000) {
+            return inventory;
+        }
+    }
+    await get("/lol-loot/v1/player-loot-map/").then(function(res) {
+        inventory = res;
+        inventoryCache["inventory"] = inventory;
+        inventoryCache["lastUpdate"] = new Date();
+    });
+    return inventory
 }
 
 // Refresh Friend History
@@ -60,6 +79,10 @@ function refreshMatchHistory() {
             }
 
             //Checks if matches has been updated in the last 20 minutes
+            console.log("Diferenca de " + (new Date() - summoner["matchesLastUpdate"]) + " milisegundos")
+            console.log(new Date().getTime())
+            console.log(summoner["matchesLastUpdate"])
+            
             if(Date.now() - summoner["matchesLastUpdate"] < 1200000) { //1200000
                 console.log("Match history for " + summoner["friendData"]["gameName"] + " is already up to date");
                 continue;
@@ -76,8 +99,9 @@ function refreshMatchHistory() {
                 do {
                     //waits 2  second between requests
                     await sleep(2000);
-                    console.log("BegIndex: " + begIndex + " EndIndex: " + endIndex)
-                    await get("/lol-match-history/v1/products/lol/"+ puuid + "/matches?begIndex=" + begIndex + "&endIndex=" + endIndex).then(res => {
+                    console.log("BegIndex: " + begIndex + " EndIndex: " + endIndex)                    
+                    await get("/lol-match-history/v1/products/lol/"+ puuid + "/matches?begIndex=" + begIndex + "&endIndex=" + endIndex).then(function(res) {
+                        console.log(requestCount);
                         requestCount++;
                         let games;
                         if("games" in res) {
@@ -170,6 +194,7 @@ const keepFriendsUpdated = async () => {
     //Keep refreshing friends
     setInterval(() => {
         console.log("Getting friends")
+        
         get("/lol-chat/v1/friends").then(res => {
             if (res.code == "ECONNREFUSED") {
 

@@ -10,6 +10,11 @@ export const navigations = [
         icon: 'group',
     },
     {
+        name: 'Hextech',
+        path: '/hextech/default',
+        icon: 'BrightnessHigh',
+    },
+    {
         label: 'PAGES',
         type: 'label',
     },

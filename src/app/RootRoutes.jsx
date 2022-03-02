@@ -5,6 +5,7 @@ import dashboardRoutes from './views/dashboard/DashboardRoutes'
 import materialRoutes from './views/material-kit/MaterialRoutes'
 
 import friendsRoutes from './views/friends/FriendsRoutes'
+import hextechRoutes from './views/hextech/HextechRoutes'
 
 const redirectRoute = [
     {
@@ -27,6 +28,7 @@ const routes = [
     ...redirectRoute,
     ...errorRoute,
     ...friendsRoutes,
+    ...hextechRoutes,
 ]
 
 export default routes
