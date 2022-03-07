@@ -2,6 +2,7 @@ import appModulePath from 'app-module-path';
 import http from 'http';
 import express from 'express';
 import cors from 'cors';
+import { result } from 'lodash';
 
 appModulePath.addPath(`${__dirname}`);
 
@@ -13,6 +14,9 @@ Api.use(cors());
 Api.get('/test', (req, res) => res.status(200).send('aeeee porraa!'));
 Api.get('/friends/get', (req, res) => res.status(200).send(friendsCache));
 Api.get('/hextech/inventory', (req, res) => getInventory().then(inventory => res.status(200).send(inventory)));
+Api.get('/hextech/loot/options', (req, res) => getLootOptions(req.query.lootId).then(options => res.status(200).send(options)));
+Api.get("/hextech/loot/recipe", (req, res) => { getLootRecipe(req.query.lootId).then(recipe => res.status(200).send(recipe)) }); 
+Api.get("/hextech/loot/craft", (req, res) => { craftLoot(req.query.recipeId, JSON.parse(req.query.lootIds)).then(craft => res.status(200).send(craft)) }); 
 
 HTTP.listen(9001, () => {
     console.log('listening on *:9001');
@@ -65,6 +69,37 @@ const getInventory = async () => {
     return inventory
 }
 
+const getLootOptions = async (lootId) => {
+    let options = undefined;    
+    await get("/lol-loot/v1/player-loot/" + lootId +"/context-menu").then(function(res) {
+        options = res;
+    });
+    return options
+}
+
+const getLootRecipe = async (lootId) => {
+    let recipe = undefined;
+    console.log("Getting recipe for " + lootId);
+    await get("/lol-loot/v1/recipes/initial-item/" + lootId).then(function(res) {
+        console.log("Got recipe for " + lootId);
+        console.log(res);
+        recipe = res;
+    });
+    return recipe
+}
+
+const craftLoot = async (recipeId, lootIds) => {
+    let craft = undefined;
+    console.log("Crafting " + recipeId);
+    //craft = {res:"SERVER CRAFT MOCK " + recipeId + " " + lootIds}  
+    await post("/lol-loot/v1/recipes/" + recipeId + "/craft", lootIds).then(function(res) {
+        console.log(recipeId + " Crafted"); 
+        console.log(res);
+        craft = res;
+    });
+    return craft
+}
+
 // Refresh Friend History
 function refreshMatchHistory() {    
     setTimeout(async () => {  
@@ -98,7 +133,7 @@ function refreshMatchHistory() {
                 
                 do {
                     //waits 2  second between requests
-                    await sleep(2000);
+                    await sleep(5000);
                     console.log("BegIndex: " + begIndex + " EndIndex: " + endIndex)                    
                     await get("/lol-match-history/v1/products/lol/"+ puuid + "/matches?begIndex=" + begIndex + "&endIndex=" + endIndex).then(function(res) {
                         console.log(requestCount);
@@ -211,7 +246,7 @@ const keepFriendsUpdated = async () => {
                 friendListElement.appendChild(element)
             });*/
         });
-    }, 5000)
+    }, 60000)
 }
 
 // Connect to LCU event

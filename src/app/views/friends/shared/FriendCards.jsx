@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Grid, Card, Icon, IconButton, Tooltip, Avatar } from '@mui/material'
+import { Grid, Card, Icon, Button, IconButton, Tooltip, Avatar } from '@mui/material'
 import { Box, styled } from '@mui/system'
 import { Small } from 'app/components/Typography'
 
@@ -39,6 +39,7 @@ const Heading = styled('h6')(({ theme }) => ({
     color: theme.palette.primary.main,
 }))
 
+
 const FriendCards = () => {
 
  
@@ -51,7 +52,7 @@ const FriendCards = () => {
             let iconUrl = 'https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/profile-icons/' + friend["friendData"]["icon"] + '.jpg'
             elementList.push(
                 <Grid item xs={12} md={6} key={friend["friendData"]["puuid"]}>
-                    <StyledCard elevation={6}>
+                        <StyledCard elevation={6}>
                         <ContentBox>
                             <Avatar src={iconUrl} />
                             <Box ml="12px">
